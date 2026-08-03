@@ -1619,9 +1619,33 @@ let glossRe = null;
   // Дефіс НЕ є межею слова для терміна: так «ABI-сумісність», «CRTP-ідіома»,
   // «RTTI-дані» отримують підказку на скороченні перед дефісом. Складені терміни
   // (IEEE-754) все одно матчаться цілком, бо довші ключі перебираються першими.
-  glossRe = new RegExp('(^|[^\\wА-Яа-яЇїІіЄєҐґ])(' + keys.map(esc).join('|') +
+  // Терміни-слова українською відмінюються («літерал» → «літералах», «триграф» →
+  // «триграфи»), тож для них дозволяємо до 3 літер закінчення. Для скорочень
+  // (ABI, UB, БД — без малих кириличних літер) залишок заборонений, інакше
+  // «БД» зчепилося б із чим завгодно.
+  const isWord = k => /[а-яїієґ]/.test(k);
+  // для слів перша літера матчиться в обох регістрах: «стек» і «Стек» на початку речення
+  const anyCase = k => {
+    const f = k[0], lo = f.toLowerCase(), up = f.toUpperCase();
+    return (lo === up ? esc(f) : '[' + esc(lo) + esc(up) + ']') + esc(k.slice(1));
+  };
+  const words = keys.filter(isWord), abbrs = keys.filter(k=>!isWord(k));
+  const alt = [];
+  if(words.length) alt.push('(?:' + words.map(anyCase).join('|') + ')[а-яїієґ]{0,3}');
+  if(abbrs.length) alt.push('(?:' + abbrs.map(esc).join('|') + ')');
+  glossRe = new RegExp('(^|[^\\wА-Яа-яЇїІіЄєҐґ])(' + alt.join('|') +
                        ')(?![\\wА-Яа-яЇїІіЄєҐґ])', 'g');
 })();
+/* «літералах» → ключ «літерал»: підбираємо найдовший ключ, яким починається збіг */
+function glossKey(term){
+  if(GLOSS[term]) return term;
+  const low = term.charAt(0).toLowerCase() + term.slice(1);   // «Стеком» → «стеком»
+  if(GLOSS[low]) return low;
+  let best = null;
+  for(const k in GLOSS)
+    if((term.startsWith(k) || low.startsWith(k)) && (!best || k.length > best.length)) best = k;
+  return best || term;
+}
 
 function applyGlossary(root){
   if(!glossRe || !root) return;
@@ -1640,7 +1664,7 @@ function applyGlossary(root){
   targets.forEach(node=>{
     glossRe.lastIndex = 0;
     const html = esc(node.nodeValue).replace(glossRe, (m, pre, term)=>
-      pre + '<abbr class="gl" data-term="' + esc(term) + '">' + esc(term) + '</abbr>');
+      pre + '<abbr class="gl" data-term="' + esc(glossKey(term)) + '">' + esc(term) + '</abbr>');
     const span = document.createElement('span');
     span.innerHTML = html;
     node.parentNode.replaceChild(span, node);
