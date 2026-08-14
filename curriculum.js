@@ -583,7 +583,7 @@ window.COURSE = {
           "cppref": [
             {
               "u": "https://en.cppreference.com/w/cpp/language/value_category",
-              "t": "Value categories — формальні означення через identity та movability"
+              "t": "Value categories — формальні визначення через identity та movability"
             },
             {
               "u": "https://en.cppreference.com/w/cpp/language/reference",
@@ -630,7 +630,7 @@ window.COURSE = {
             },
             {
               "u": "https://en.cppreference.com/w/cpp/language/aggregate_initialization",
-              "t": "Aggregate initialization — означення агрегату за стандартами"
+              "t": "Aggregate initialization — визначення агрегату за стандартами"
             }
           ],
           "book": [
@@ -910,7 +910,7 @@ window.COURSE = {
             },
             {
               "u": "https://en.cppreference.com/w/cpp/types/is_compound",
-              "t": "is_compound — означений просто як !is_fundamental"
+              "t": "is_compound — визначений просто як !is_fundamental"
             },
             {
               "u": "https://en.cppreference.com/w/cpp/types/decay",
@@ -1258,7 +1258,7 @@ window.COURSE = {
             {
               "name": "P701_Functions",
               "level": "junior",
-              "title": "Оголошення й означення, перевантаження, способи передавання"
+              "title": "Оголошення й визначення, перевантаження, способи передавання"
             }
           ]
         },
